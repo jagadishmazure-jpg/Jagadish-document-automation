@@ -1,17 +1,17 @@
-"""34 deterministic tests for the document automation platform."""
+"""Deterministic tests for the document automation platform."""
 
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from docauto.repository import DocumentStore, RepositoryError
-from docauto.metadata import MetadataIndex, MetadataError
-from docauto.search import SearchEngine
-from docauto.governance import RetentionEngine, RetentionPolicy, GovernanceError
-from docauto.security import AccessControl, AccessDenied
+from docauto.esign import SignatureError, SignatureService
+from docauto.governance import GovernanceError, RetentionEngine, RetentionPolicy
 from docauto.idp import classify, extract_fields
+from docauto.metadata import MetadataError, MetadataIndex
+from docauto.repository import DocumentStore, RepositoryError
+from docauto.search import SearchEngine
+from docauto.security import AccessControl, AccessDenied
 from docauto.workflow import WorkflowEngine, WorkflowError
-from docauto.esign import SignatureService, SignatureError
 
 INVOICE = """INVOICE NO INV-2041
 Bill To: Acme Corp

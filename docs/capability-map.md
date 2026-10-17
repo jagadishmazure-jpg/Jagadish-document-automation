@@ -1,32 +1,32 @@
-# Gartner capability map
+# Document management capability map
 
-How this repo's modules map to the Gartner Magic Quadrant for Document
-Management (April 2026) mandatory and common features.
+The capabilities below are my own grouping of what an enterprise document
+management platform has to do, and where each one lives in this repo. They are
+written from general practice, not copied from any analyst report.
 
-## Mandatory features
+## Core capabilities
 
-| Gartner feature | Implemented by |
-|---|---|
-| **Document repository** — store, organize, retrieve documents | `repository.py` — `DocumentStore` with stable IDs, content addressing |
-| **Check-in / check-out** — prevent conflicting edits | `repository.py` — `checkout()` locks; second user blocked; `checkin()` releases |
-| **Version control** — track document history | `repository.py` — every `update()` appends an immutable `DocumentVersion`; `get_version(n)` |
-| **Metadata management** — system + custom metadata | `metadata.py` — `MetadataIndex`; system fields (created_by, created_at, size, checksum) are read-only and enforced |
-| **Search** — full-text and metadata search | `search.py` — `SearchEngine` over content + metadata, with snippets |
-| **Information governance** — retention, legal hold, disposition | `governance.py` — `RetentionEngine`: per-type retention policies, `declare_record()` legal holds, `run_disposition()` with policy-cited log |
-| **Security** — access control, audit | `security.py` — `AccessControl` (RBAC × per-document ACLs) + hash-chained `AuditLog` |
-| **Intelligent document processing** — classify, extract | `idp.py` — `classify()` (invoice/contract/receipt/policy/memo) + `extract_fields()` with confidence + source snippets |
+| Capability | What it means | Implemented by |
+|---|---|---|
+| Repository | Store, organise and retrieve documents under stable IDs | `repository.py`: `DocumentStore` with content checksums |
+| Check-out / check-in | Stop two people editing the same document at once | `repository.py`: `checkout()` locks; a second user is blocked; `checkin()` releases |
+| Versioning | Keep every revision and allow retrieval of any version | `repository.py`: each `update()` appends an immutable `DocumentVersion`; `get_version(n)` |
+| Metadata | System fields that cannot be edited plus custom fields | `metadata.py`: `MetadataIndex`; created_by, created_at, size and checksum are read-only |
+| Search | Full-text and metadata search that respects permissions | `search.py`: `SearchEngine` with snippets and security trimming |
+| Retention and records | Retention periods, record declaration (legal hold), disposition | `governance.py`: `RetentionEngine`, `declare_record()`, `run_disposition()` with a policy-cited log |
+| Security and audit | Role and per-document permissions, tamper-evident audit | `security.py`: `AccessControl` (RBAC plus per-document ACLs) and a hash-chained `AuditLog` |
+| Document understanding | Classify a document and extract key fields | `idp.py`: `classify()` (invoice, contract, receipt, policy, memo) and `extract_fields()` with confidence and source snippets |
 
-## Common features
+## Process capabilities
 
-| Gartner feature | Implemented by |
-|---|---|
-| **Workflow automation** — route documents for review/approval | `workflow.py` — `WorkflowEngine`: draft → in_review → approved/rejected/changes_requested state machine, reviewer queue, SLA tracking |
-| **E-signature** — capture legally-recognized intent | `esign.py` — `SignatureService`: intent capture with content hash, multi-signer envelopes, `seal()` + `verify_seal()` tamper check (functional mock) |
-| **Records management** — declare, protect, dispose of records | `governance.py` — `declare_record()` blocks edit/dispose; disposition skips declared records and logs the skip |
-| **Audit trail** — who did what, when | `security.py` — every access decision recorded in the hash-chained audit log; `verify_chain()` detects tampering |
+| Capability | What it means | Implemented by |
+|---|---|---|
+| Review and approval workflow | Route documents to reviewers with a clear state | `workflow.py`: draft, in review, approved, rejected or changes requested; reviewer queue; SLA tracking |
+| Electronic signature | Capture each signer's intent against a content hash | `esign.py`: multi-signer envelopes, `seal()` and `verify_seal()` (a functional mock, not a legal signature) |
+| Records protection | Declared records cannot be edited or disposed of | `governance.py`: disposition skips declared records and logs the skip |
 
-## Deliberately out of scope
+## Out of scope
 
-- Real e-signature legality (mock only; production uses DocuSign/Adobe Sign).
-- OCR / image processing (IDP here works on text; production adds an OCR stage).
-- Federated search across external repositories (single-store scope).
+- Legally binding e-signature (the module is a mock; production would use a commercial signature service).
+- OCR and image processing (classification here works on text).
+- Federated search across other repositories.

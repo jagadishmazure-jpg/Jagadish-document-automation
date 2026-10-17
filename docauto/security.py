@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 ROLE_RANK = {"viewer": 1, "editor": 2, "manager": 3, "admin": 4}
